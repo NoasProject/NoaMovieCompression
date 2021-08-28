@@ -42,6 +42,7 @@ filePath=""
 compressDirPath=""
 compressFileName=""
 compressFilePath=""
+isMute="no"
 
 # 圧縮メッセージ
 compressMessage=""
@@ -125,11 +126,24 @@ else
     exit 1
 fi
 
+# ミュートにするかどうか
+echo ""
+echo "--------------"
+read -p "動画ファイルから音声を削除しますか? (y/N): " yn
+echo ""
+
+# 入力NG
+if [ "${yn}" = "y" ] || [ "${yn}" = "Y" ]; then
+    isMute="yes";
+    echo " 動画からサウンドを削除します"
+fi
+
 echo ""
 echo "フォルダパス: ${dirPath}"
 echo " 元ファイル: ${fileName}"
 echo " 圧縮ファイル: ${compressFileName}"
 echo "圧縮設定: ${compressMessage}"
+echo "音を削除するか: ${isMute}"
 read -p "処理を開始しますか? (y/N): " yn
 echo ""
 
@@ -144,6 +158,13 @@ echo "処理を開始します"
 # ファイルサイズ
 totalSize=0
 compressSize=0
+
+
+muteCmd=""
+if [ "${isMute}" = "yes" ]; then
+    muteCmd="-an "
+fi
+
 
 # ディレクトリの場合の処理
 if [ -d "${filePath}" ]; then
@@ -173,9 +194,9 @@ if [ -d "${filePath}" ]; then
         echo "CompressPath: ${newFilePath}"
 
         if [ "${compressType}" = "1" ]; then
-            result=`ffmpeg -i ${file} ${newFilePath}`
+            result=`ffmpeg -i ${file} ${muteCmd}${newFilePath}`
         elif [ "${compressType}" = "2" ]; then
-            result=`ffmpeg -i ${file} -b:v 1200k ${newFilePath}`
+            result=`ffmpeg -i ${file} ${muteCmd}-b:v 1200k ${newFilePath}`
         else
             echo "Error."
             exit 1
@@ -192,10 +213,11 @@ if [ -d "${filePath}" ]; then
 
 # ファイルの場合の処理
 else
+
     if [ "${compressType}" = "1" ]; then
-    result=`ffmpeg -i ${filePath} ${compressFilePath}`
+        result=`ffmpeg -i ${filePath} ${muteCmd}${compressFilePath}`
     elif [ "${compressType}" = "2" ]; then
-        result=`ffmpeg -i ${filePath} -b:v 1200k ${compressFilePath}`
+        result=`ffmpeg -i ${filePath} ${muteCmd}-b:v 1200k ${compressFilePath}`
     else
         echo "Error."
         exit 1
