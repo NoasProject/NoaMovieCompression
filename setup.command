@@ -8,4 +8,4 @@ echo "shellの簡易コマンドファイルの作成をおこないます"
 cp -r "${dirPath}/shell/CompressionMovie.sh" "${dirPath}/Command/CompressionMovie.command"
 ln -sf "${dirPath}/Command/CompressionMovie.command" "${HOME}/"
 
-echo 0
+exit 0
